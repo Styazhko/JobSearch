@@ -1,26 +1,29 @@
-from django.contrib.auth import logout
-from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect
-# from django.urls import reverse_lazy
-from django.views.generic import CreateView
-from .forms import RegisterUserForm, LoginUserForm
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render
+from django.views import View
+from .forms import UserCreationForm
 
+class Registration(View):
 
-class Register(CreateView):
-    template_name = 'registration.html'
-    form_class = RegisterUserForm
-    success_url = '/login/'
+    template_name = 'registration/registration.html'
 
+    def get(self, request):
+        context = {
+            'form': UserCreationForm
+        }
+        return render(request, self.template_name, context)
 
-class Login(LoginView):
-    template_name = 'login.html'
-    form_class = LoginUserForm
+    def post(self, request):
+        form = UserCreationForm(request.POST)
 
-
-    # def get_success_url(self):
-    #     return reverse_lazy('/')
-
-
-def logout_user(request):
-    logout(request)
-    return redirect('/')
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect('main')
+        context = {
+            'form': form
+        }
+        return render(request, self.template_name, context)
