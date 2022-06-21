@@ -7,7 +7,7 @@ from django.db import models
 class Company(models.Model):
     name = models.CharField(max_length=64, verbose_name='Название компании')
     location = models.CharField(max_length=64, verbose_name='Местоположение')
-    logo = models.ImageField(upload_to=settings.MEDIA_COMPANY_IMAGE_DIR, blank=True, null=True,verbose_name='Изображение')
+    logo = models.ImageField(upload_to='company/%Y-%m-%d/', blank=True, null=True,verbose_name='Изображение')
     description = models.TextField(verbose_name='Информация о компании')
     employee_count = models.IntegerField(verbose_name='Количество сотрудников')
     owner = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE, related_name='company')
@@ -17,11 +17,14 @@ class Company(models.Model):
         verbose_name_plural = 'Компании'
         ordering = ['name']
 
+    def __str__(self):
+        return self.name
+
 
 class Specialty(models.Model):
     code = models.CharField(max_length=64, unique=True)
     title = models.CharField(max_length=64)
-    picture = models.ImageField(upload_to=settings.MEDIA_COMPANY_IMAGE_DIR, verbose_name='Изображение')
+    picture = models.ImageField(upload_to='specialty/', verbose_name='Изображение')
 
     class Meta:
         verbose_name = 'Специальности'
@@ -46,6 +49,9 @@ class Vacancy(models.Model):
         verbose_name = 'Вакансии'
         verbose_name_plural = 'Вакансии'
         ordering = ['-published_at', 'company']
+
+    def __str__(self):
+        return self.title_vacancy
 
 
 class Response(models.Model):

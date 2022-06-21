@@ -21,7 +21,9 @@ class MainView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['specialies'] = Specialty.objects.annotate(vacancies_count=Count('vacancies'))
-        context['companies'] = random.sample(list(Company.objects.annotate(vacancies_count=Count('vacancies'))), 8)
+        context['companies'] = Company.objects.annotate(vacancies_count=Count('vacancies'))
+        if len(list(Company.objects.annotate(vacancies_count=Count('vacancies')))) >= 8:
+            context['companies'] = random.sample(list(Company.objects.annotate(vacancies_count=Count('vacancies'))), 8)
         return context
 
 
@@ -30,7 +32,7 @@ class VacancyView(ListView):
     queryset = Vacancy.objects.select_related('company')
     template_name = 'vacancies.html'
     context_object_name = 'vacancies'
-    paginate_by = 4
+    paginate_by = 5
 
 
 class CategoryView(ListView):
